@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# code by Avigdor (https://github.com/avigdork/xbmc-avigdork)
+# code by Avigdor and Nux007 (https://github.com/Nux007/Kodi-plugin.video.playlistLoader)
 import urllib, urlparse, sys, xbmcplugin ,xbmcgui, xbmcaddon, xbmc, os, json, hashlib
 
 AddonID = 'plugin.video.playlistLoader'

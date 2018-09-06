@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.2.0" provider-name="Avigdor">
+<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.2.1" provider-name="Avigdor and Nux007">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
-	<import addon="repository.xbmc-avigdork" />
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
@@ -14,8 +13,16 @@
     <description lang="he">Playlist Loader</description>
     <platform>all</platform>
 	<news>
+1.2.1
+- Taking ownership of the addon, see : https://github.com/avigdork/xbmc-avigdork/pull/8#issuecomment-416955692
+- Fixed regex => grouping issue when tvg-logo was empty.
+- Added icon image also when items are grouped.
+- Regex fix for title containing comas.
+- Added TheTvDb scan for each lists in contextual menu ( beta ).
+
 1.2.0
 - (fix) support strings.xml (old Kodi versions).
+
 1.1.9
 - Added an option to show groups in channels lists.
 	</news>
