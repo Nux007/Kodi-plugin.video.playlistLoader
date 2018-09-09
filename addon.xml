@@ -2,6 +2,7 @@
 <addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.2.1" provider-name="Avigdor and Nux007">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.requests" version="2.9.1"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
