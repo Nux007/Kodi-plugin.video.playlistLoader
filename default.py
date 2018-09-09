@@ -167,7 +167,10 @@ def m3uCategory(url, logos, cache, gListIndex=-1):
 			if isGroupChannel:
 				name = '{0}'.format(name)
 				chUrl = url
-				image = channel['tvg_logo'] if meta is None else meta[channel["group_title"]]["poster"] if channel["group_title"] in meta else channel['tvg_logo']
+				try:
+					image = channel['tvg_logo'] if meta is None else meta[channel["group_title"]]["poster"] if channel["group_title"] in meta else channel['tvg_logo']
+				except KeyError:
+					image = "DefaultTVShows.png"
 				AddDir(name ,url, 10, index=idx, iconimage=image, plot=plot, fanart=fanart)
 			else:
 				chUrl = common.GetEncodeString(channel["url"])
