@@ -1,3 +1,9 @@
+1.2.2
+- Fixed logo error grouping items: #4 from Nux007/dev
+
+1.2.1.1
+- Fixed missing import: #1 from avigdork/patch-1
+
 1.2.1
 - Taking ownership of the addon, see : https://github.com/avigdork/xbmc-avigdork/pull/8#issuecomment-416955692
 - Fixed regex => grouping issue when tvg-logo was empty.
