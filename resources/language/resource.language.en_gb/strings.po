@@ -168,6 +168,26 @@ msgctxt "#30039"
 msgid "click to change"
 msgstr ""
 
+msgctxt "#30040"
+msgid "Add new directory"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Add to existing directory"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Select an icon for this directory ( optional )"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Delete directory and content"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Delete directory and move contents to root"
+msgstr ""
+
 msgctxt "#30101"
 msgid "Delete Playlists file"
 msgstr ""

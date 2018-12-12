@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.2.2" provider-name="Avigdor and Nux007">
+<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.3.0" provider-name="Avigdor and Nux007">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.requests" version="2.9.1"/>
@@ -14,12 +14,14 @@
     <description lang="he">Playlist Loader</description>
     <platform>all</platform>
 	<news>
-	
-1.2.2
-- Fixed logo error grouping items.
-
-1.2.1.1
-- Fixed missing import
+1.3.0
+- Added default icons.
+- Added transparency to existing icons for better themes integration.
+- Added virtual directories feature allowing a better categorization of m3u lists.
+- Refresh favourites list when moving an item.
+- Ability to move playlists root and directories sides.
+- Refresh playlists and directories when moving an item.
+- Disabled TvDb and MovieDb for now ( waiting for improvements )
 
 1.2.1
 - Taking ownership of the addon, see : https://github.com/avigdork/xbmc-avigdork/pull/8#issuecomment-416955692
@@ -28,11 +30,6 @@
 - Regex fix for title containing comas.
 - Added TheTvDb scan for each lists in contextual menu ( beta ).
 
-1.2.0
-- (fix) support strings.xml (old Kodi versions).
-
-1.1.9
-- Added an option to show groups in channels lists.
 	</news>
   </extension>
 </addon>

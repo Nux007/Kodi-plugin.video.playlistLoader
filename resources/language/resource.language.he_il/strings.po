@@ -175,3 +175,23 @@ msgstr "מחיקת קובץ הרשימות"
 msgctxt "#30102"
 msgid "Delete Favourites file"
 msgstr "מחיקת קובץ המועדפים"
+
+msgctxt "#30040"
+msgid "Add new directory"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Add to existing directory"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Select an icon for this directory ( optional )"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Delete directory and content"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Delete directory and move contents to root"
+msgstr ""

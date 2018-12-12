@@ -39,6 +39,11 @@
 	<string id="30037">Yes</string>
 	<string id="30038">No</string>
 	<string id="30039">click to change</string>
+	<string id="30040">Add new directory</string>
+	<string id="30041">Add to existing directory</string>
+	<string id="30042">Select an icon for this directory ( optional )</string>
+	<string id="30043">Delete directory and content</string>
+	<string id="30044">Delete directory and move contents to root</string>
 	<string id="30101">Delete Playlists file</string>
 	<string id="30102">Delete Favourites file</string>
 </strings>
