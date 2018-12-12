@@ -23,7 +23,6 @@
 - Refresh playlists and directories when moving an item.
 - Disabled TvDb and MovieDb for now ( waiting for improvements )
 
-
 1.2.1
 - Taking ownership of the addon, see : https://github.com/avigdork/xbmc-avigdork/pull/8#issuecomment-416955692
 - Fixed regex => grouping issue when tvg-logo was empty.
