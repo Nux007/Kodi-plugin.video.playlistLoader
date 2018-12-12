@@ -99,11 +99,15 @@ def Categories():
     
     i = 0
     chList = common.ReadList(playlistsFile) 
-    addList = []   
-    for uitem in chList:
-        if not uitem["uuid"].encode("utf-8") in ignored:
-            addList.append(chList[i])
-        i += 1
+    addList = []
+    try:	
+        for uitem in chList:
+            if "uuid" in uitem and not uitem["uuid"].encode("utf-8") in ignored:
+                addList.append(chList[i])
+            i += 1
+    except:
+        addList = chList
+		
     AddListItems(addList)
 
 
