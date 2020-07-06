@@ -1,6 +1,6 @@
 # Kodi-plugin.video.playlistLoader
 
-Forked of Nux007
+Taking ownership of plugin.video.playlistLoader previously owned by Avigdork
 
 - Added Youtube Support
 
