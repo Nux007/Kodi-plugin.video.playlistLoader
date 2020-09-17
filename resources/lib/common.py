@@ -151,9 +151,18 @@ def plx2list(url, cache):
 
 def m3u2list(url, cache):
 	response = GetList(url, cache)	
-	matches=re.compile('^#EXTINF:-?[0-9]*(.*?),([^\"]*?)\n(.*?)$', re.M).findall(response)
+#	matches=re.compile('^#EXTINF:-?[0-9]*(.*?),([^\"]*?)\n(.*?)$', re.M).findall(response)
+	matches=re.compile('(?s)^#EXTINF:-?[0-9]*(.*?),(.*?)\n(.*?)#EXT#', re.M).findall(response.replace('#EXTINF','#EXT#\n#EXTINF'))
 	li = []
-	for params, display_name, url in matches:
+	for params, display_name, uri in matches:
+		url = uri
+		if uri.startswith('#'):
+			for ln in uri.splitlines():
+				if not ln.startswith('#'): url = ln
+				else:
+					if ln.startswith('#EXTGRP'): 
+						params += ln.replace('"', '').replace("#EXTGRP:" ,' group_title="') + '"'
+
 		item_data = {"params": params, "display_name": display_name.strip(), "url": url.strip()}
 		li.append(item_data)
 	chList = []

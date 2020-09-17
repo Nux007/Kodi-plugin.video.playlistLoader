@@ -1,3 +1,5 @@
+1.4.1
+- Added support for #EXTGRP  tag.
 1.4.0
 - Forked of Nux007
 - Add Youtube Support
