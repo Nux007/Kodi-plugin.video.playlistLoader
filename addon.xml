@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.4.1" provider-name="osgioia">
+<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.4.6" provider-name="osgioia">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="script.module.xmltodict" version="0.11.0"/>
+    <import addon="script.module.dateutil" version="2.8.1"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
@@ -14,6 +16,16 @@
     <description lang="he">Playlist Loader</description>
     <platform>all</platform>
 	<news>
+1.4.6
+- fix for absent icon source
+1.4.5
+- cache reload period for EPG
+1.4.4
+- EPG plot update
+1.4.3
+- Added Russian language support and minor EPG tweacks
+1.4.2
+- Added support for xmltv EPG
 1.4.1
 - Added support for #EXTGRP group tag.
 1.4.0

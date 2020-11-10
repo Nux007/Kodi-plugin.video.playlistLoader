@@ -44,6 +44,10 @@
 	<string id="30042">Select an icon for this directory ( optional )</string>
 	<string id="30043">Delete directory and content</string>
 	<string id="30044">Delete directory and move contents to root</string>
+	<string id="30045">Change channels EPG source</string>
+	<string id="30046">Select channels EPG source</string>
+	<string id="30047">Channels EPG base URL</string>
+	<string id="30048">Channels EPG Folder</string>
 	<string id="30101">Delete Playlists file</string>
 	<string id="30102">Delete Favourites file</string>
 </strings>

@@ -2,6 +2,7 @@ import urllib, urllib2, os, io, xbmc, xbmcaddon, xbmcgui, json, re, chardet, shu
 from StringIO import StringIO
 import requests, shutil
 from xbmc import getLocalizedString
+import xmltodict
 
 AddonID = 'plugin.video.playlistLoader'
 Addon = xbmcaddon.Addon(AddonID)
@@ -109,6 +110,7 @@ def SaveList(filname, chList):
 		xbmc.log(str(ex), 3)
 		success = False
 	return success
+	
 
 def OKmsg(title, line1, line2 = None, line3 = None):
 	dlg = xbmcgui.Dialog()
@@ -118,7 +120,15 @@ def isFileNew(file, deltaInSec):
 	lastUpdate = 0 if not os.path.isfile(file) else int(os.path.getmtime(file))
 	now = int(time.time())
 	return False if (now - lastUpdate) > deltaInSec else True 
-	
+
+def isFromCache(address, cache=0):
+	if address.startswith('http'):
+		fileLocation = os.path.join(cacheDir, hashlib.md5(address.encode('utf8')).hexdigest())
+		retval = isFileNew(fileLocation, cache*60)
+	else:
+		retval = isFileNew(address.decode('utf-8'), cache*60)
+	return retval
+
 def GetList(address, cache=0):
 	if address.startswith('http'):
 		fileLocation = os.path.join(cacheDir, hashlib.md5(address.encode('utf8')).hexdigest())
@@ -150,8 +160,7 @@ def plx2list(url, cache):
 
 
 def m3u2list(url, cache):
-	response = GetList(url, cache)	
-#	matches=re.compile('^#EXTINF:-?[0-9]*(.*?),([^\"]*?)\n(.*?)$', re.M).findall(response)
+	response = GetList(url, cache) + "#EXT#"
 	matches=re.compile('(?s)^#EXTINF:-?[0-9]*(.*?),(.*?)\n(.*?)#EXT#', re.M).findall(response.replace('#EXTINF','#EXT#\n#EXTINF'))
 	li = []
 	for params, display_name, uri in matches:
@@ -174,6 +183,52 @@ def m3u2list(url, cache):
 		chList.append(item_data)
 	return chList
 	
+def SaveDict(filname, dict):
+	try:
+		with io.open(filname, 'w', encoding='utf-8') as handle:
+			handle.write(json.dumps(dict).decode('utf-8'))
+			handle.close()
+		success = True
+	except Exception as ex:
+		xbmc.log(str(ex), 3)
+		success = False
+	return success
+	
+def epg2dict(url, cache):
+	eDict={}
+	fn = os.path.join(cacheDir, hashlib.md5((url + '.ebk').encode('utf8')).hexdigest())
+	if isFromCache(url, cache):
+		eDict = ReadList(fn)
+		if not eDict: eDict = {} 
+	if not eDict: 
+		response = GetList(url, cache)
+		try:
+			doc = xmltodict.parse(response)
+		except: return {}
+			
+		nList = []
+		dList=[]
+		pDict={}
+		for ch in doc['tv']['channel']:
+			nList.append(GetEncodeString(ch['display-name']['#text']))
+			try: dList.append((ch['@id'], ch['icon']['@src']))
+			except: dList.append((ch['@id'], ""))
+
+		for prg in doc['tv']['programme']:
+			if pDict.get(prg['@channel']) == None:
+				pDict[prg['@channel']] = []
+			else: 
+				try: pDict[prg['@channel']].append((prg['@start'], prg['@stop'], prg['title']['#text']))
+				except: pass
+		
+		if len(nList):
+			eDict[u'name'] = nList;
+			eDict[u'data'] = dList
+			eDict[u'prg'] = pDict
+
+		SaveDict(fn, eDict)
+
+	return eDict
 	
 	
 def GetEncodeString(str):

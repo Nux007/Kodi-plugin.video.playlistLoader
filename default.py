@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # code by Avigdor and Nux007 (https://github.com/Nux007/Kodi-plugin.video.playlistLoader)
 import urllib, urlparse, sys, xbmcplugin ,xbmcgui, xbmcaddon, xbmc, os, json, hashlib, uuid as random
+from datetime import datetime
+from dateutil import parser
+from dateutil import tz
 
 AddonID = 'plugin.video.playlistLoader'
 Addon = xbmcaddon.Addon(AddonID)
@@ -55,10 +58,11 @@ def AddListItems(chList, addToVdir=True):
             image = os.path.join(iconsDir, "default-list-image.png")
         
         logos = item.get('logos', '')
+        epg = item.get('epg', '')
         cacheMin = item.get('cache', '0')
         if item["url"].startswith('http'):
             cacheList.append(hashlib.md5(item["url"].encode("utf-8")).hexdigest())
-        AddDir("[{0}]".format(name) ,item["url"].encode("utf-8"), mode, image.encode("utf-8"), logos.encode("utf-8"), index=i, uuid=uuid4.encode("utf-8"), cacheMin=cacheMin, addToVdir=addToVdir)
+        AddDir("[{0}]".format(name) ,item["url"].encode("utf-8"), mode, image.encode("utf-8"), logos.encode("utf-8"), epg.encode("utf-8"), index=i, uuid=uuid4.encode("utf-8"), cacheMin=cacheMin, addToVdir=addToVdir)
         i += 1
 
     for the_file in os.listdir(cacheDir):
@@ -124,6 +128,9 @@ def AddNewList():
     logosUrl = '' if listUrl.endswith('.plx') else GetChoice(30018, 30019, 30020, 30019, 30020, 30021, fileType=0)
     if logosUrl.startswith('http') and not logosUrl.endswith('/'):
         logosUrl += '/'
+    epgUrl = '' if listUrl.endswith('.plx') else GetChoice(30046, 30047, 30048, 30047, 30048, 30021, fileType=0)
+    if epgUrl.startswith('http') and not epgUrl.endswith('/'):
+        epgUrl += '/'
     cacheInMinutes = GetNumFromUser(getLocaleString(30034), '0') if listUrl.startswith('http') else 0
     if cacheInMinutes is None:
         cacheInMinutes = 0
@@ -132,7 +139,7 @@ def AddNewList():
         if item["url"].lower() == listUrl.lower():
             xbmc.executebuiltin('Notification({0}, "{1}" {2}, 5000, {3})'.format(AddonName, item["name"].encode("utf-8"), getLocaleString(30007), icon))
             return
-    chList.append({"name": listName.decode("utf-8"), "url": listUrl, "image": image, "logos": logosUrl, "cache": cacheInMinutes, "uuid":str(random.uuid4())})
+    chList.append({"name": listName.decode("utf-8"), "url": listUrl, "image": image, "logos": logosUrl, "epg": epgUrl, "cache": cacheInMinutes, "uuid":str(random.uuid4())})
     if common.SaveList(playlistsFile, chList):
         xbmc.executebuiltin("XBMC.Container.Refresh()")
 
@@ -218,7 +225,7 @@ def PlxCategory(url, cache):
     
     
             
-def m3uCategory(url, logos, cache, gListIndex=-1): 
+def m3uCategory(url, logos, epg, cache, mode, gListIndex=-1): 
       
     meta = None
     '''
@@ -232,6 +239,16 @@ def m3uCategory(url, logos, cache, gListIndex=-1):
     '''
     tmpList = []
     chList = common.m3u2list(url, cache)
+    if mode == 10 and epg != None and epg != '':
+      epgDict = common.epg2dict(epg, cache=720)
+      dnow = datetime.now(tz.UTC)
+      to_zone = tz.tzlocal()
+      use_percent = 'true'
+      use_time = 'true'
+    else: epgDict = {}
+    
+    #xbmc.log('EPGDICT')
+    #xbmc.log(str(epgDict))
     groupChannels = []
     
     for channel in chList:
@@ -251,6 +268,7 @@ def m3uCategory(url, logos, cache, gListIndex=-1):
         isGroupChannel = gListIndex < 0 and len(channels) > 1
         chs = [channels[0]] if isGroupChannel else channels
         
+        #xbmc.log(str(epgDict.get(u'name')))
         for channel in chs:
             name = common.GetEncodeString(channel["display_name"]) if not isGroupChannel else common.GetEncodeString(channel.get("group_title", channel["display_name"]))
             plot = "" if meta is None else meta[channel["group_title"]]["overview"] if channel["group_title"] in meta else ""
@@ -263,13 +281,65 @@ def m3uCategory(url, logos, cache, gListIndex=-1):
                     image = channel['tvg_logo'] if meta is None else meta[channel["group_title"]]["poster"] if channel["group_title"] in meta else channel['tvg_logo']
                 except KeyError:
                     image = "DefaultTVShows.png"
-                AddDir(name ,url, 10, index=idx, iconimage=image, plot=plot, fanart=fanart)
+                AddDir(name ,url, 10, epg=epg, index=idx, iconimage=image, cacheMin=cache, plot=plot, fanart=fanart)
             else:
                 chUrl = common.GetEncodeString(channel["url"])
                 image = channel.get("tvg_logo", channel.get("logo", ""))
+                '''
+                if image == "" and epgDict:
+                    if name.decode('utf-8') in epgDict.get(u'name'):
+                        image = epgDict[u'data'][epgDict[u'name'].index(name.decode('utf-8'))][1]
+                    if name in epgDict.get(u'name'):
+                        image = epgDict[u'data'][epgDict[u'name'].index(name)][1]
+'''
+                if epgDict:
+                    idx = None
+                    id = None
+                    if epgDict.get(u'name'):
+                        if name.decode('utf-8') in epgDict.get(u'name'):
+                            idx = epgDict[u'name'].index(name.decode('utf-8'))
+                        if name in epgDict.get(u'name'):
+                            idx = epgDict[u'name'].index(name)
+                        if image == "" and idx is not None:
+                                image = epgDict[u'data'][idx][1]
+                                
+                        t2len = 0
+                        title2nd = ''
+                        edescr = ''
+                        next = False
+
+                        if idx is not None:
+                            #xbmc.log(str( epgDict.get('prg').get(epgDict[u'data'][idx][0])))
+                            if epgDict.get('prg').get(epgDict[u'data'][idx][0]):
+                                for start,stop,title in epgDict.get('prg').get(epgDict[u'data'][idx][0]):
+                                    stime = parser.parse(start)
+                                    etime = parser.parse(stop)
+                                    if stime <= dnow <= etime or next:
+                                        ebgn = stime.astimezone(to_zone).strftime('%H:%M')
+                                        eend = etime.astimezone(to_zone).strftime('%H:%M')
+                                        if use_time == 'true':
+                                            stmp = '%s-%s' % (ebgn, eend)
+                                            t2len += (len(stmp) + 1) 
+                                            if not next: title2nd += ' [COLOR FF00BB66]%s[/COLOR]' % stmp
+                                            else:  title2nd += ' %s' % stmp
+                                        title2nd += ' %s' % title
+                                        t2len += (len(title) + 1)
+                                        
+                                        title2nd = title2nd.replace('&quot;','`').replace('&amp;',' & ')
+                                        if not t2len: t2len = len(name)
+                                        if not next:
+                                            plot += '[B][COLOR FF0084FF]%s-%s[/COLOR] [COLOR FFFFFFFF] %s[/COLOR][/B]' % (ebgn, eend, title)
+                                            name = '[B]%s[/B]\n%s' % (name.ljust(int(t2len * 1.65)), title2nd.encode('utf-8'))
+                                            next = True
+                                        else: 
+                                            plot += '[COLOR FF999999]\n\n%s-%s %s[/COLOR]\n' % (ebgn, eend, title) 
+                                            next = False
+                                            break
+
+                
                 if logos is not None and logos != ''  and image != "" and not image.startswith('http'):
                     image = logos + image
-                AddDir(name, chUrl, 3, image, index=-1, isFolder=False, IsPlayable=True, plot=plot, fanart=fanart)
+                AddDir(name, chUrl, 3, image, epg=epg, index=-1, isFolder=False, IsPlayable=True, plot=plot, fanart=fanart)
             tmpList.append({"url": chUrl.decode("utf-8"), "image": image.decode("utf-8"), "name": name.decode("utf-8")})
     
     common.SaveList(tmpListFile, tmpList)
@@ -298,8 +368,8 @@ def PlayUrl(name, url, iconimage=None):
 
 
 
-def AddDir(name, url, mode, iconimage='', logos='', index=-1, move=0, uuid='0', isFolder=True, IsPlayable=False, background=None, cacheMin='0', plot="", fanart="", addToVdir=True):
-    urlParams = {'name': name, 'url': url, 'mode': mode, 'iconimage': iconimage, 'logos': logos, 'cache': cacheMin, 'uuid': uuid}
+def AddDir(name, url, mode, iconimage='', logos='', epg='', index=-1, move=0, uuid='0', isFolder=True, IsPlayable=False, background=None, cacheMin='0', plot="", fanart="", addToVdir=True):
+    urlParams = {'name': name, 'url': url, 'mode': mode, 'iconimage': iconimage, 'logos': logos, 'epg': epg, 'cache': cacheMin, 'uuid': uuid}
     
     liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
     liz.setInfo(type="Video", infoLabels={ "Title": name, "plot": plot, "plotoutline": plot, "tagline": plot})
@@ -323,6 +393,7 @@ def AddDir(name, url, mode, iconimage='', logos='', index=-1, move=0, uuid='0', 
         
         if mode == 2 and not url.endswith('.plx'):
             items.append((getLocaleString(30029), 'XBMC.RunPlugin({0}?index={1}&mode=26&uuid={2})'.format(sys.argv[0], index, uuid)))
+            items.append((getLocaleString(30045), 'XBMC.RunPlugin({0}?index={1}&mode=29&uuid={2})'.format(sys.argv[0], index, uuid)))
         if url.startswith('http'):
             items.append((getLocaleString(30035), 'XBMC.RunPlugin({0}?index={1}&mode=28&uuid={2})'.format(sys.argv[0], index, uuid)))
                     
@@ -548,7 +619,6 @@ def ChangeKey(iuuid, listFile, key, title, favourites=False):
     if common.SaveList(listFile, chList):
         xbmc.executebuiltin("XBMC.Container.Refresh()")
         
-    
         
 def ChangeChoice(iuuid, listFile, key, choiceTitle, fileTitle, urlTitle, choiceFile, choiceUrl, choiceNone=None, fileType=1, fileMask=None, favourites=False):
     index = GetPlaylistIndex(iuuid, listFile) if not favourites else iuuid
@@ -699,6 +769,7 @@ def ToggleGroups():
 params = dict(urlparse.parse_qsl(sys.argv[2].replace('?','')))
 url = params.get('url')
 logos = params.get('logos', '')
+epg = params.get('epg', '')
 name = params.get('name')
 iconimage = params.get('iconimage')
 cache = int(params.get('cache', '0'))
@@ -715,7 +786,7 @@ elif mode == 1:
     PlxCategory(url, cache)
     
 elif mode == 2 or mode == 10:
-    m3uCategory(url, logos, cache, index)
+    m3uCategory(url, logos, epg, cache, mode, index)
 
 elif mode == 3 or mode == 32:
     PlayUrl(name, url, iconimage)
@@ -747,6 +818,9 @@ elif mode == 27:
 
 elif mode == 28:
     ChangeCache(uuid, playlistsFile)
+    
+elif mode == 29:
+    ChangeChoice(uuid, playlistsFile, "epg", 30046, 30047, 30048, 30047, 30048, 30021, 0)    
 
 elif mode == 30:
     ListFavorites() 
@@ -826,5 +900,7 @@ elif mode == 42:
         
 elif mode == 50:
     ToggleGroups()
+    
+
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

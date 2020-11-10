@@ -1,3 +1,13 @@
+1.4.6
+- fix for absent icon source
+1.4.5
+- cache reload period for EPG
+1.4.4
+- EPG plot update
+1.4.3
+- Added Russian language support and minor EPG tweacks
+1.4.2
+- Added support for xmltv EPG
 1.4.1
 - Added support for #EXTGRP  tag.
 1.4.0
