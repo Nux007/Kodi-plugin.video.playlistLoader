@@ -1,3 +1,5 @@
+1.4.7
+- fix for weird/double channel name
 1.4.6
 - fix for absent icon source
 1.4.5
