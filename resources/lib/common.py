@@ -204,18 +204,48 @@ def epg2dict(url, cache):
 		response = GetList(url, cache)
 		try:
 			doc = xmltodict.parse(response)
-		except: return {}
-			
+		except: 
+			return {}
+		'''
+			try: 
+				xbmc.log(str('*****'))
+				
+				
+				data = StringIO(zlib.decompress(response))
+				#data = gzip.GzipFile('', 'rb', 9, StringIO(response))
+				content = data.read()
+				doc = xmltodict.parse(content)
+        
+				url_file_handle=StringIO( response )
+				xbmc.log(str(url_file_handle))
+				gzip_file_handle = gzip.GzipFile(fileobj=url_file_handle)
+				xbmc.log(str(gzip_file_handle))
+				decompressed_data = gzip_file_handle.read()
+				xbmc.log(str(decompressed_data))
+				gzip_file_handle.close()
+				doc = xmltodict.parse(decompressed_data)
+			except:
+				return {}
+		'''
+		
 		nList = []
 		dList=[]
 		pDict={}
 		for ch in doc['tv']['channel']:
-			try: nList.append(GetEncodeString(ch['display-name']['#text']))
+#			try: nList.append(GetEncodeString(ch['display-name']['#text']))
+#			except:
+#				try: nList.append(GetEncodeString(ch['display-name']['#text'][0]))
+#				except: nList.append(GetEncodeString("??????"))
+			try:
+				xbmc.log(GetEncodeString(ch['display-name']['#text']))
+				nList.append(GetEncodeString(ch['display-name']['#text']))
+				try: dList.append((ch['@id'], ch['icon']['@src']))
+				except: dList.append((ch['@id'], ""))
 			except:
-				try: nList.append(GetEncodeString(ch['display-name']['#text'][0]))
-				except: nList.append(GetEncodeString("??????"))
-			try: dList.append((ch['@id'], ch['icon']['@src']))
-			except: dList.append((ch['@id'], ""))
+				for dname in ch['display-name']:
+					nList.append(GetEncodeString(dname['#text']))
+					try: dList.append((ch['@id'], ch['icon']['@src']))
+					except: dList.append((ch['@id'], ""))
 
 		for prg in doc['tv']['programme']:
 			if pDict.get(prg['@channel']) == None:

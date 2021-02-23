@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.4.7" provider-name="osgioia">
+<addon id="plugin.video.playlistLoader" name="Playlist Loader" version="1.4.8" provider-name="osgioia">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.requests" version="2.9.1"/>
@@ -16,6 +16,8 @@
     <description lang="he">Playlist Loader</description>
     <platform>all</platform>
 	<news>
+1.4.8
+- EPG fix for list of channel names under the same id number
 1.4.7
 - fix for weird/double channel name
 1.4.6
