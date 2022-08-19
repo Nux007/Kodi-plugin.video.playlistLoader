@@ -349,7 +349,8 @@ def m3uCategory(url, logos, epg, cache, mode, gListIndex=-1):
         
 def PlayUrl(name, url, iconimage=None):
     if url.startswith('acestream://'):
-       url = 'plugin://program.plexus/?mode=1&url={0}&name={1}&iconimage={2}'.format(url, name, iconimage)
+       # url = 'plugin://program.plexus/?mode=1&url={0}&name={1}&iconimage={2}'.format(url, name, iconimage)
+       url = 'plugin://script.module.horus?action={0}&id={1}&title={2}'.format('play', url[12:], 'Video')
     elif url.startswith('https://www.youtube.com'):
        auxurl = url[url.find('v=') + 2:]
        url = 'plugin://plugin.video.youtube/play/?video_id={0}'.format(auxurl)
